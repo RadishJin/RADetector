@@ -1,13 +1,11 @@
 # RADetector
 
----
 RADetector is a lightweight pipeline designed for benchmarking protein structural evaluation metrics:  
 RMSD, lDDT, TM-score  
   
 Made by Mu Jin Kim (BS student @ Kyungpook National University, Department of Biotechnology)  
 Contact : radishj24@gmail.com  
 Managed under GitFlow branching model  
----
 
 
  - Versions
