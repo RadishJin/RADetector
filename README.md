@@ -24,7 +24,7 @@ Managed under GitFlow branching model
         raw_dataset/        # Raw dataset from PDB [Ignored by Git]
         test_dataset/       # Noise-injected decoy datasets [Ignored by Git]
 
-        result/             # Final evaluation summary
+        result/             # Final evaluation summary [Ignored by Git]
         src/
             gathering.sh    # Bash script for fetching datasets
             parsing.py      # Data parsing and tensor conversion
