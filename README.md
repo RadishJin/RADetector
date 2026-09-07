@@ -2,7 +2,7 @@
 
 ---
 RADetector is a lightweight pipeline designed for benchmarking protein structural evaluation metrics:
-RMSD, lDDT, TM-score
+RMSD (Backbone, Ca), lDDT (Backbone, Ca), TM-score
 
 Made by Mu Jin Kim (BS student @ Kyungpook National University, Department of Biotechnology)
 Contact : radishj24@gmail.com
