@@ -1,6 +1,7 @@
 # Dataset files
 raw_dataset/
 test_dataset/
+.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
