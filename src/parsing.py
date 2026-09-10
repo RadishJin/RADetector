@@ -12,6 +12,7 @@ with gzip.open("raw_dataset/1CLL.cif.gz", "rt", encoding = "utf-8") as f:
 
 # pdbx.get_structrue로 텍스트데이터를 AtomArray로 파싱
 atoms = pdbx.get_structure(raw, model= 1) # 1D로 파싱하기 위해 model = 1
+# print(atoms)
 
 # Biotite.structure 이용 residue와 관련된 원자만 남기기 (비표준 아미노산도 포함)
 residue_mask = struc.filter_amino_acids(atoms)
@@ -22,6 +23,12 @@ residue_atom = atoms[residue_mask]
 # print(list(set(residue_atom.get_annotation("res_name"))))
 # 앞뒤로 Residue 4개 missing. 앞으로 고려 필요함. 끝부분이라서 달랑거렸을테니 Crystallography의 한계인듯? 
 
+
+# Backbone atoms & Ca 만 따로 남기기
+
+is_backbone = struc.filter_peptide_backbone(residue_atom)
+bb_atoms = residue_atom[is_backbone]
+print(bb_atoms)
 
 
 
