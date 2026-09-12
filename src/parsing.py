@@ -28,7 +28,13 @@ residue_atom = atoms[residue_mask]
 
 is_backbone = struc.filter_peptide_backbone(residue_atom)
 bb_atoms = residue_atom[is_backbone]
-print(bb_atoms)
+# print(bb_atoms)
+
+is_ca = (bb_atoms.get_annotation("atom_name") == "CA")
+# print(is_ca)
+ca_atoms = bb_atoms[is_ca]
+# print(ca_atoms)
+
 
 
 
