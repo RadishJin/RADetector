@@ -44,7 +44,7 @@ Managed under GitFlow branching model
         3. Python, PyTorch Tensor로 저장
 
     2. 테스트 데이터셋 만들기
-        1. 저장한 PyTorch Tensor 데이터 가져오기, 외부 실험 데이터 가져오기
+        1. 저장한 PyTorch Tensor 데이터 가져오기
         2. 정답 데이터에 특정 강도 노이즈 주입
         3. 테스트 데이터로 저장
 
