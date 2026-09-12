@@ -28,8 +28,8 @@ Managed under GitFlow branching model
         src/
             gathering.sh    # Bash script for fetching datasets
             parsing.py      # Data parsing and tensor conversion
-            preparing.py    # Noise injection and decoy generation
-            testing.py      # Metric calculation (TM-score, lDDT, RMSD)
+            preparing.py    # Torsion angle 기반 decoy 생성
+            eval.py         # Metric calculation with decoy (TM-score, lDDT, RMSD)
 
         .gitignore
         LICENSE
