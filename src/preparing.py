@@ -20,7 +20,20 @@ for id in id_list:
 
 # 각 target의 특징에 따라 decoy 생성
 id_single_chain = ["1CRN", "1CLL"]
+multi_chain = data_dict["5DK3"][0]
 decoy_dict = {}
+
+# 0. 멀티체인 전처리 (체인별)
+
+chain_start = struc.get_chain_starts(multi_chain)
+# print(chain_start)
+chain_mask = struc.get_chain_masks(multi_chain, chain_start)
+chain_list = []
+for i in range(len(chain_mask)):
+    strand = multi_chain[chain_mask[i]]
+    chain_list.append(strand)
+# print(chain_list)
+
 # 1. 1CRN Crambin (가장 기본형)
 
 
@@ -38,7 +51,53 @@ for id in id_single_chain:
         pre1 = data_dict[f"{id}"].copy()
         struc.coord(pre1)[:] = noise_coord
         decoy_dict[f"{id}_{sigma}angstrom"] = pre1
-    
+
+# Multi chain
+
+# 체인별로 나눠서 노이즈 주입
+chain_decoy = {}
+n = 0
+for chain in chain_list:
+    bb_coord = struc.coord(chain)
+    bb_tensor = torch.tensor(bb_coord)
+    sigmas = [0.5, 1.0, 2.0, 5.0]
+    for sigma in sigmas:
+        noise = torch.randn_like(bb_tensor) * sigma
+        noise_coord = bb_tensor + noise
+        noise_coord = noise_coord.detach().cpu().numpy()
+        pre1 = chain.copy()
+        struc.coord(pre1)[:] = noise_coord
+        chain_decoy[f"n{sigma}angstrom_chain{n}"] = pre1
+    n += 1
+
+# print(chain_decoy.keys())
+# print(chain_list[1][:10])
+# print(chain_decoy["chain1_2.0angstrom"][:10])
+
+# 하나로 합치기
+ang05, ang10, ang20, ang50 = [], [], [], []
+for id, chain in chain_decoy.items():
+    if id.startswith(f"n{sigmas[0]}"):
+        ang05.append(chain)
+    if id.startswith(f"n{sigmas[1]}"):
+        ang10.append(chain)
+    if id.startswith(f"n{sigmas[2]}"):
+        ang20.append(chain)
+    if id.startswith(f"n{sigmas[3]}"):
+        ang50.append(chain)
+
+n = 0
+for i in ang05, ang10, ang20, ang50:
+    combined_chain = sum(i, struc.AtomArray(0))
+    decoy_dict[f"5DK3_{sigmas[n]}angstrom"] = combined_chain
+    n += 1
+
+# print(decoy_dict.keys())
+# print(decoy_dict["5DK3_0.5angstrom"][:10])
+# print(data_dict["5DK3"][0][:10])
+
+
+
     
 # test
 # print(noise_coord)
@@ -151,7 +210,7 @@ for id in id_single_chain:
     decoy_dict[f"{id}_ex60"] = pre4
 
 
-print(decoy_dict.keys())
+# print(decoy_dict.keys())
 # print(decoy_dict["1CRN_ex60"][60:80])
 # print(data_dict["1CRN"][0][60:80])
 
