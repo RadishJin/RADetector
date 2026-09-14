@@ -167,6 +167,64 @@ for id in id_single_chain:
 
 # print(decoy_dict.keys())
 
+# Multi Chain
+chain_decoy = {}
+n = 0
+for chain in chain_list:
+    bb_phi, bb_psi, bb_omega = struc.dihedral_backbone(chain)
+    bb_phi_tensor = torch.tensor(bb_phi)
+    bb_psi_tensor = torch.tensor(bb_psi)
+    bb_omega_tensor = torch.tensor(bb_omega)
+    tensor_list = [bb_phi_tensor, bb_psi_tensor, bb_omega_tensor]
+    angle_noise_list = [pi/36, pi/18]
+    pre_decoy = []
+    for angle in angle_noise_list:
+        for tensor in tensor_list:
+            noise = torch.randn_like(tensor) * angle
+            noise = noise.detach().cpu().numpy().tolist()
+            pre_decoy.append(noise)
+
+    five_degree = [i for j in zip(pre_decoy[0], pre_decoy[1], pre_decoy[2]) for i in j]
+    ten_degree = [i for j in zip(pre_decoy[3], pre_decoy[4], pre_decoy[5]) for i in j]
+
+    five_degree = five_degree[1:-1]
+    ten_degree = ten_degree[1:-1]
+
+    j = 0
+    for angle in five_degree, ten_degree:
+        pre2 = chain.copy()
+        for i in range(len(angle)):
+            if i+2 > len(pre2):
+                break
+            axis = pre2[i+1].coord - pre2[i].coord
+            support = pre2[i+1].coord
+            downstream = pre2[i+2:]
+            downstream = struc.rotate_about_axis(
+                downstream,
+                angle = angle[i],
+                axis = axis,
+                support = support
+            )
+            struc.coord(pre2[i+2:])[:] = struc.coord(downstream)
+        j += 5
+        chain_decoy[f"n{j}degree_{n}"] = pre2
+    n += 1
+# print(chain_decoy.keys())
+
+five, ten = [], []
+angles = [5, 10]
+for id, chain in chain_decoy.items():
+    if id.startswith(f"n{angles[0]}"):
+        five.append(chain)
+    if id.startswith(f"n{angles[1]}"):
+        ten.append(chain)
+
+n = 0
+for i in five, ten:
+    combined_chain = sum(i, struc.AtomArray(0))
+    decoy_dict[f"5DK3_{angles[n]}degree"] = combined_chain
+    n += 1
+
 
 # (3) Local Extreme Perturbation (대충 가운데 부근 한 곳에서 결합각 대폭 조정, 30도 60도.)
 
@@ -211,8 +269,8 @@ for id in id_single_chain:
 
 
 # print(decoy_dict.keys())
-# print(decoy_dict["1CRN_ex60"][60:80])
-# print(data_dict["1CRN"][0][60:80])
+print(decoy_dict["5DK3_5degree"][60:80])
+print(data_dict["5DK3"][0][60:80])
 
 
 
