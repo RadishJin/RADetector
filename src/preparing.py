@@ -336,3 +336,7 @@ for i in pre8, pre9:
 # test
 # print(decoy_dict.keys())
 # print(decoy_dict["5DK3_ex60"] == data_dict["5DK3"][0])
+for name, array in decoy_dict.items():
+    cif_file = pdbx.CIFFile()
+    pdbx.set_structure(cif_file, array, data_block=f"decoy_{name}")
+    cif_file.write(f"test_dataset/decoy_{name}.cif")
