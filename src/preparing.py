@@ -3,6 +3,7 @@ import biotite.structure.io.pdbx as pdbx    # 읽어오기
 import biotite.structure as struc
 import torch                                # 텐서 변환, 노이즈 생성용 
 from math import pi
+import random
 
 
 # parsing()   # 파싱 데이터 생성. 이미 있으면 덮어써버림
@@ -268,13 +269,70 @@ for id in id_single_chain:
     decoy_dict[f"{id}_ex60"] = pre4
 
 
+
+
+# Multi Chain
+chain_decoy = {}
+
+chain = random.choice(chain_list)
+chain_name = struc.get_chains(chain)[0]
+# print(chain_name)
+
+pre3 = chain.copy()
+pre4 = chain.copy()
+
+mid = int(len(pre3)/2)
+
+downstream = pre3[mid:]
+axis = pre3[mid - 1].coord - pre3[mid - 2].coord
+support = pre3[mid-1].coord
+downstream = struc.rotate_about_axis(
+    downstream,
+    angle = torsion[0],
+    axis = axis,
+    support = support
+)
+struc.coord(pre3[mid:])[:] = struc.coord(downstream)
+chain_decoy[f"{chain_name}_ex30"] = pre3
+
+downstream = pre4[mid:]
+axis = pre4[mid-1].coord - pre4[mid-2].coord
+support = pre4[mid-1].coord
+downstream = struc.rotate_about_axis(
+    downstream,
+    angle = torsion[1],
+    axis = axis,
+    support = support
+)
+struc.coord(pre4[mid:])[:] = struc.coord(downstream)
+chain_decoy[f"{chain_name}_ex60"] = pre4
+# print(chain_decoy)
+# print(struc.get_chains(chain_list[0]))
+
+chain_num_map = {
+    "A" : 0,
+    "B" : 1,
+    "F" : 2,
+    "G" : 3
+}
+alpha = list(chain_decoy.keys())[0]
+alpha = alpha.strip().split("_")[0]
+chain_num = chain_num_map[alpha]
+# print(chain_num)
+
+pre8 = chain_list.copy()
+pre9 = chain_list.copy()
+pre8[chain_num] = chain_decoy[f"{alpha}_ex30"]
+pre9[chain_num] = chain_decoy[f"{alpha}_ex60"]
+
+ex_list = [30, 60]
+n = 0
+for i in pre8, pre9:
+    combined_chain = sum(i, struc.AtomArray(0))
+    decoy_dict[f"5DK3_ex{ex_list[n]}"] = combined_chain
+    n += 1
+
+
+# test
 # print(decoy_dict.keys())
-print(decoy_dict["5DK3_5degree"][60:80])
-print(data_dict["5DK3"][0][60:80])
-
-
-
-
-
-
-
+# print(decoy_dict["5DK3_ex60"] == data_dict["5DK3"][0])
