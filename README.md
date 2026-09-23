@@ -4,15 +4,15 @@ Author : MU JIN KIM, BS student @ kyungpook national univ.
 Contact : radishj24@gmail.con
 
 
-Main Protein : Epidermal Growth Factor Receptor (EGFR)
+Main Protein : EGFR (Epidermal Growth Factor Receptor) CHEMBL203
 
-Comparison A : HER2 (ERBB2)
+Comparison A : HER2 (Human Epidermal Growth Factor Receptor 2) CHEMBL1824
  > Same Kinase Family, Similar RADetect
-Comparison B : CSF1R (FMS)
+Comparison B : CSF1R (Macrophage colony-stimulating factor 1 receptor) CHEMBL1844
  > Same Kinase Family, Different RADetect
-Comparison C : CDK2
+Comparison C : CDK2 (Cyclin-dependent kinase 2) CHEMBL301
  > Different Family, Different RADetect
-Comparison D : Carbonic Anhydrase II (CA2)
+Comparison D : CA2 (Carbonic Anhydrase 2) CHEMBL205
  > Different Family, Simular RADetect
 
 
