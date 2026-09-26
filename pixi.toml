@@ -10,6 +10,7 @@ version = "0.1.0"
 [dependencies]
 python = "3.11.*"
 pandas = ">=3.0.6,<4"
+duckdb = ">=1.5.5,<2"
 
 [pypi-dependencies]
 chembl-webresource-client = ">=0.10.9, <0.11"
