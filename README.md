@@ -1,7 +1,7 @@
 # RADetector
 Identifying functional similarity between proteins through their molecular-interaction patterns.
 Author : MU JIN KIM, BS student @ kyungpook national univ.
-Contact : radishj24@gmail.con
+Contact : radishj24@gmail.com
 
 
 Main Protein : EGFR (Epidermal Growth Factor Receptor) CHEMBL203
@@ -23,8 +23,8 @@ Overview
     ii. 결합 분자 리스트 만들기
 
 2. target protein의 molecular interaction 데이터로 일종의 지문 도출 (python)
-    ii. 가로축은 Van der Waals volume, 세로축은 pKa로 ndarray 배열 생성
-    iii. Gaussian Kernal Density Estimation 이용 2D 이미지로 변환
+    ii. 가로축은 Van der Waals volume, 세로축은 pKa로 ndarray 배열 생성 -> 나중에 뭐든 추가될 수 있게
+    iii. Gaussian Kernal Density Estimation 이용 2D 이미지로 변환 -> n차원 확장 가능하게
     v. target protein에 할당
 
 3. ndarray 유사도 평가 (python)
