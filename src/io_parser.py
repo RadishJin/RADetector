@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 from chembl_webresource_client.new_client import new_client
-from typing import Iterator
+from typing import Iterable
+
+
+class IDNotFoundError(Exception):
+    """ ChEMBL ID가 존재하지 않을 때 발생하는 예외 """
 
 
 # 이터레이터 형태로 Input data 가져오는 함수
-def io_chembl_b_molecule(prt_id: str) -> Iterator[dict]:
+def io_chembl_b_molecule(prt_id: str) -> Iterable[dict] | None:
     """ ChEMBL Binding Assay 데이터를 이터레이터 형태로 가져옴 """
 
     # Activity 층 접근 -> 여기에 바인딩 어세이 존재
@@ -20,19 +26,56 @@ def io_chembl_b_molecule(prt_id: str) -> Iterator[dict]:
         'pchembl_value',
     ])
 
+    # 무결성 평가
+    try:
+        query = validate_iterator(query)
+    except IDNotFoundError:
+        return None
+
     return query
 
 
 # 수정 용이한 형태로 원데이터 파싱
 def parse_chembl_b_molecule(raw: dict[str, str | float]) -> dict[str, dict[str, str | float]]:
-    """ ChEMBL Binding Assay 데이터 정렬, 파싱 함수. 개별 데이터를 다룸. """
+    """ ChEMBL Binding  Assay 데이터 정렬, 파싱 함수. 개별 데이터를 다룸. """
 
     return {raw['molecule_chembl_id']: {k: v for k, v in raw.items() if k != 'molecule_chembl_id' and k != 'value'}}
 
 
+# 쿼리 무결성 검증 함수
+def validate_iterator(query: Iterable[dict]) -> Iterable[dict]:
+    """ 이터레이터(쿼리) 무결성 검증 함수. 값이 하나라도 있으면 True"""
+
+    test_query = iter(query)
+
+    try:
+        _ = next(test_query)
+    except StopIteration:
+        raise IDNotFoundError('잘못된 ChEMBL Protein ID')
+
+    return query
+
+
+
+
 # test
 if __name__ == '__main__':
-    prt_id = 'CHEMBL203'
-    m_raw = io_chembl_b_molecule(prt_id)
-    m_test = parse_chembl_b_molecule(next(m_raw))
-    print(m_test)
+
+    prt_id1 = 'CHEMBL203'
+    m_raw = io_chembl_b_molecule(prt_id1)
+
+    i = 0
+    if m_raw is not None:
+        for m in m_raw:
+            print(parse_chembl_b_molecule(m))
+            i += 1
+            if i == 3:
+                break
+            
+
+    prt_id2 = 'CHAKEMFANF'
+    m_raw = io_chembl_b_molecule(prt_id2)
+    print(m_raw)
+    if m_raw is not None:
+        m_test2 = parse_chembl_b_molecule(next(m_raw))
+        print(m_test2)
