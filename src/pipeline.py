@@ -1,4 +1,4 @@
-from io_parser import io_chembl_b_molecule, parse_chembl_b_molecule
+from io_parser import io_prot_bindmol, parse_prot_query, io_mol_property, parse_mol_property
 
 # 전역변수
 PROTEIN_IDS = [
@@ -9,3 +9,19 @@ PROTEIN_IDS = [
     'CHEMBL205'     # CA2
 ]
 
+# test pipeline
+test_id = 'CHEMBL203'
+
+raw = io_prot_bindmol(test_id)          # Protein ID 해당하는 모든 Binding Molecules Input - QuerySet
+
+molecule = raw[129]                     # 아무 Molecule이나 뽑아서
+
+mol = parse_prot_query(molecule)        # ID, dict(Properties) - Tuple
+
+mol_raw = io_mol_property(mol[0])       # Molecule ID 해당하는 모든 Chemical Properties Input - Dict
+
+mol_prop = parse_mol_property(mol_raw)  # 필요한 Property만 모아서
+
+mol[1].update(mol_prop)                 # Molecule Tuple의 Property Dict에 추가
+
+print(mol)
