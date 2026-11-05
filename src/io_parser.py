@@ -7,6 +7,9 @@ from typing import Iterable
 class NotFoundError(Exception):
     """ 데이터가 존재하지 않을 때 발생하는 예외 """
 
+class NotValidError(Exception):
+    """ 데이터가 형태에 맞지 않을 때 발생하는 예외 """
+
 
 # 쿼리 무결성 검증 함수
 def _validate_query(query: Iterable[dict]) -> Iterable[dict]:
@@ -21,7 +24,7 @@ def _validate_query(query: Iterable[dict]) -> Iterable[dict]:
 
 
 # 이터레이터 형태로 Input data 가져오는 함수
-def io_prot_bindmol(prot_id: str) -> Iterable[dict] | None:
+def io_prot_bindmol(prot_id: str) -> Iterable[dict]:
     """ ChEMBL Binding Assay 데이터 가져옴 """
 
     # Activity 층 접근 -> 여기에 바인딩 어세이 존재
@@ -38,16 +41,13 @@ def io_prot_bindmol(prot_id: str) -> Iterable[dict] | None:
         'pchembl_value',
     ])
 
-    try:
-        query = _validate_query(query)
-    except NotFoundError:
-        return None
+    query = _validate_query(query)
 
     return query
 
 
 # pKa IO
-def io_mol_property(mol_id: str) -> dict | None:
+def io_mol_property(mol_id: str) -> dict:
     """ ChEMBL Molecule pKa 데이터 가져옴 """
 
     # Molecule 층 접근 -> 여기에 pKa 존재
@@ -60,10 +60,7 @@ def io_mol_property(mol_id: str) -> dict | None:
         'molecule_properties',
     ])
 
-    try:
-        query = _validate_query(query)
-    except NotFoundError:
-        return None
+    query = _validate_query(query)
 
     return query[0]['molecule_properties']
 
@@ -94,6 +91,6 @@ def parse_mol_property(mol_prop: dict[str, str | float]) -> dict[str, float] | N
         try:
             parsed[k] = float(val)
         except (ValueError, TypeError):
-            return None
+            raise NotValidError('잘못된 Property 값')
             
     return parsed
