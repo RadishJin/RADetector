@@ -13,7 +13,7 @@ class EmbedFailError(Exception):
 
 # =========================================
 # Van Der Waals Volume calculation
-def calc_smiles_vdwvolume(canonical_smiles : Any) -> float:
+def calc_vdwvolume(canonical_smiles : Any) -> float:
     """ smiles 를 이용하여 Van Der Waals Volume을 계산해주는 함수 """
 
     mol = Chem.MolFromSmiles(canonical_smiles)  # RDkit 전용 Class로 Smiles 파싱
