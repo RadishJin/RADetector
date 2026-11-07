@@ -9,7 +9,7 @@ from io_parser import io_prot_bindmol, parse_prot_query, io_mol_property, parse_
 from calc import calc_vdwvolume
 
 # Custom Errors
-from config import NotFoundError, NotValidError, EmbedFailError
+from config import PipelineError
 
 
 # 전역변수
@@ -38,9 +38,9 @@ RES_DICT : dict = {}
 #     try:
 #         mol_raw : QuerySet = io_prot_bindmol(prot_id)
 
-#     except NotFoundError as e:
+#     except PipelineError as e:
 #         OMIT_PROT.append(prot_id)
-#         print(f'Proein : {prot_id} : {e}')
+#         print(f'Protein : {prot_id} : {e}')
 #         continue
 #     # =====================================
 
@@ -63,7 +63,7 @@ RES_DICT : dict = {}
 #         try:
 #             prop_raw : QuerySet = io_mol_property(mol_id)
 
-#         except NotFoundError as e:
+#         except PipelineError as e:
 #             _omit_mol.append(mol_id)
 #             print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
 #             continue
@@ -75,7 +75,7 @@ RES_DICT : dict = {}
 #         try:
 #             prop : dict = parse_mol_property(prop_raw)
 
-#         except (NotFoundError, NotValidError) as e:
+#         except PipelineError as e:
 #             _omit_mol.append(mol_id)
 #             print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
 #             continue
@@ -92,7 +92,7 @@ RES_DICT : dict = {}
 #         try:
 #             vdw : float = calc_vdwvolume(canonical_smiles)
 
-#         except (NotValidError, EmbedFailError) as e:
+#         except PipelineError as e:
 #             _omit_mol.append(mol_id)
 #             print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
 #             continue
@@ -107,14 +107,13 @@ RES_DICT : dict = {}
 # =========================================
 
 
-
 # Test
 # =========================================
 test_id = 'CHEMBL203'
 
 raw = io_prot_bindmol(test_id)          # Protein ID 해당하는 모든 Binding Molecules Input - QuerySet >> 여기서 NotFound 발생 가능성
                                                                                                  
-molecule = raw[129]                     # 아무 Molecule이나 뽑아서
+molecule = raw[12837]                     # 아무 Molecule이나 뽑아서
 
 mol = parse_prot_query(molecule)        # ID, dict(Properties) - Tuple
 

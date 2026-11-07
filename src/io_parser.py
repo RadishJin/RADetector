@@ -6,10 +6,10 @@ from typing import Iterable
 from config import NotFoundError, NotValidError
 
 
-# ========================================= 내부함수
-# 쿼리 무결성 검증 함수
+# 내부 함수
+# =========================================
+# 이터레이터(쿼리) 무결성 검증 함수. 값이 하나라도 있으면 True
 def _validate_query(query: Iterable[dict]) -> Iterable[dict]:
-    """ 이터레이터(쿼리) 무결성 검증 함수. 값이 하나라도 있으면 True"""
 
     try:
         _ = query[0]
@@ -21,7 +21,6 @@ def _validate_query(query: Iterable[dict]) -> Iterable[dict]:
 
 
 # =========================================
-# 이터레이터 형태로 Input data 가져오는 함수
 def io_prot_bindmol(prot_id: str) -> Iterable[dict]:
     """ ChEMBL Binding Assay 데이터 가져옴 """
 
