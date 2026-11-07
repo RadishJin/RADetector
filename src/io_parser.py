@@ -3,14 +3,10 @@ from __future__ import annotations
 from chembl_webresource_client.new_client import new_client
 from typing import Iterable
 
-# Custom Exceptions
-class NotFoundError(Exception):
-    """ 데이터가 존재하지 않을 때 발생하는 예외 """
-
-class NotValidError(Exception):
-    """ 데이터가 형태에 맞지 않을 때 발생하는 예외 """
+from config import NotFoundError, NotValidError
 
 
+# ========================================= 내부함수
 # 쿼리 무결성 검증 함수
 def _validate_query(query: Iterable[dict]) -> Iterable[dict]:
     """ 이터레이터(쿼리) 무결성 검증 함수. 값이 하나라도 있으면 True"""
@@ -21,8 +17,10 @@ def _validate_query(query: Iterable[dict]) -> Iterable[dict]:
         raise NotFoundError('잘못된 쿼리 요청 ID')
 
     return query
+# =========================================
 
 
+# =========================================
 # 이터레이터 형태로 Input data 가져오는 함수
 def io_prot_bindmol(prot_id: str) -> Iterable[dict]:
     """ ChEMBL Binding Assay 데이터 가져옴 """
@@ -46,9 +44,9 @@ def io_prot_bindmol(prot_id: str) -> Iterable[dict]:
     return query
 
 
-# pKa IO
+# Chemical Property 
 def io_mol_property(mol_id: str) -> dict:
-    """ ChEMBL Molecule pKa 데이터 가져옴 """
+    """ ChEMBL Molecule Property 데이터 가져옴 """
 
     # Molecule 층 접근 -> 여기에 pKa 존재
     molecule = new_client.molecule
@@ -74,7 +72,7 @@ def parse_prot_query(molecule: dict[str, str | float]) -> tuple[str, dict[str, s
 
 
 # property 데이터 파싱
-def parse_mol_property(mol_prop: dict[str, str | float]) -> dict[str, float] | None:
+def parse_mol_property(mol_prop: dict[str, str | float]) -> dict[str, float]:
     """ ChEMBL Molecule pKa 데이터 정렬, 파싱 함수. 개별 데이터를 다룸. """
 
     target_keys = {
@@ -85,12 +83,14 @@ def parse_mol_property(mol_prop: dict[str, str | float]) -> dict[str, float] | N
     parsed = {}
     for k in target_keys:
         val = mol_prop.get(k)
+
         if val is None:
-            return None
+            raise NotFoundError(f'{k}값 없음')
         
         try:
             parsed[k] = float(val)
         except (ValueError, TypeError):
-            raise NotValidError('잘못된 Property 값')
+            raise NotValidError('잘못된 형태의 Property 값')
             
     return parsed
+# =========================================
