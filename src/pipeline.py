@@ -1,19 +1,26 @@
-# Library
+########################## MODULE & LIBRARY ####
 from __future__ import annotations
 
-# Classes
-from chembl_webresource_client.new_client import QuerySet
+# Standard Libraries
+# ============================
+# ============================
 
-# Custom Modules
+# Third-Party Libraries
+# ============================
+from chembl_webresource_client.new_client import QuerySet
+# ============================
+
+# Custom Modules & Classes
+# ============================
 from io_parser import io_prot_bindmol, parse_prot_query, io_mol_property, parse_mol_property
 from calc import calc_vdwvolume
 
-# Custom Errors
 from config import PipelineError
+# ============================
+#### MODULE & LIBRARY ##########################
 
 
-# 전역변수
-# =========================================
+########################### GLOBAL VARIABLE ####
 PROTEIN_IDS : list[str] = [
     'CHEMBL203',    # EFGR
     'CHEMBL1824',   # HER2
@@ -21,20 +28,27 @@ PROTEIN_IDS : list[str] = [
     'CHEMBL301',    # CDK2
     'CHEMBL205'     # CA2
 ]
-
 OMIT_PROT : list[str] = []
 OMIT_MOL : dict[str, list] = {}
 RES_DICT : dict = {}
-# =========================================
+#### GLOBAL VARIABLE ###########################
 
 
-# Pipeline
-# =========================================
+################################## INTERNAL ####
+# ============================1
+# ============================1
+#### INTERNAL ##################################
+
+
+###################################### MAIN ####
+# ============================
+# # def pipeline():
 # for prot_id in PROTEIN_IDS:
 #     _omit_mol : list = []
 
-#     # Input Binding Molecules
-#     # =====================================
+#     # 1단계: Input Binding Molecules
+#     # ============================
+
 #     try:
 #         mol_raw : QuerySet = io_prot_bindmol(prot_id)
 
@@ -42,88 +56,113 @@ RES_DICT : dict = {}
 #         OMIT_PROT.append(prot_id)
 #         print(f'Protein : {prot_id} : {e}')
 #         continue
-#     # =====================================
+
+#     # ============================
 
 
-#     # Parse & Create Molecule Property Dictionary
-#     # =====================================
+#     # 2단계: Parse & Create Molecule Property Dictionary
+#     # ============================
+
 #     for raw in mol_raw:
-#         mol : tuple = parse_prot_query(raw)
 
+#             # 2-0 단계 : Set Variable
+#             mol : tuple = parse_prot_query(raw)
+#             mol_id : str = mol[0]
+#             prop_dict : dict[str, float] = mol[1]
+    
+    
+#             # 2-1 단계: Input Molecule Properties
+#             # =================================
 
-#         # Set variables
-#         # =================================
-#         mol_id : str = mol[0]
-#         prop_dict : dict[str, float] = mol[1]
-#         # =================================
+#             try:
+#                 prop_raw : QuerySet = io_mol_property(mol_id)
+    
+#             except PipelineError as e:
+#                 _omit_mol.append(mol_id)
+#                 print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
+#                 continue
+            
+#             # =================================
+    
+    
+#             # 2-2 단계: Parse Fundamental Molecule Properties    
+#             # =================================
 
+#             try:
+#                 prop : dict = parse_mol_property(prop_raw)
+    
+#             except PipelineError as e:
+#                 _omit_mol.append(mol_id)
+#                 print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
+#                 continue
+    
+#             prop_dict.update(prop)
 
-#         # Input Molecule Properties
-#         # =================================
-#         try:
-#             prop_raw : QuerySet = io_mol_property(mol_id)
+#             # =================================
+    
+    
+#             # 2-3 단계: Calculate Additional Properties
+#             # =================================
 
-#         except PipelineError as e:
-#             _omit_mol.append(mol_id)
-#             print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
-#             continue
-#         # =================================
+#             canonical_smiles : str = prop_dict['canonical_smiles']
+    
+#             # 2-3-1 단계: Van Der Waals Volume
+#             try:
+#                 vdw : float = calc_vdwvolume(canonical_smiles)
+    
+#             except PipelineError as e:
+#                 _omit_mol.append(mol_id)
+#                 print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
+#                 continue
+                
+#             # 2-3-2 단계: Acidity, Basicity
+#             # 미정
 
-
-#         # Parse Fundamental Molecule Properties    
-#         # =================================
-#         try:
-#             prop : dict = parse_mol_property(prop_raw)
-
-#         except PipelineError as e:
-#             _omit_mol.append(mol_id)
-#             print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
-#             continue
-
-#         prop_dict.update(prop)
-#         # =================================
-
-
-#         # Calculate Additional Properties
-#         # =================================
-#         canonical_smiles : str = prop_dict['canonical_smiles']
-
-#         # Van Der Waals Volume
-#         try:
-#             vdw : float = calc_vdwvolume(canonical_smiles)
-
-#         except PipelineError as e:
-#             _omit_mol.append(mol_id)
-#             print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
-#             continue
-
-#         # Acidity, Basicity
-#         # 미완
-#         # =================================
-
+#             # =================================
+            
 #     OMIT_MOL[prot_id] = _omit_mol
-#     # =====================================
 
-# =========================================
+#     # ============================
+# ============================
+#### MAIN ######################################
 
 
-# Test
-# =========================================
-test_id = 'CHEMBL203'
 
-raw = io_prot_bindmol(test_id)          # Protein ID 해당하는 모든 Binding Molecules Input - QuerySet >> 여기서 NotFound 발생 가능성
-                                                                                                 
-molecule = raw[12837]                     # 아무 Molecule이나 뽑아서
+# 실행 진입점 (Entry Point)
+if __name__ == '__main__':
+    print('[0-0-0] Test: Get started')
+    print()
 
-mol = parse_prot_query(molecule)        # ID, dict(Properties) - Tuple
+    # Test
+    # =========================================
+    test_id = 'CHEMBL203'
+    
+    # level 1
+    raw = io_prot_bindmol(test_id)
+    molecule = raw[12837]
+    print('[1-0-0] Test:')
+    print(molecule)
 
-mol_raw = io_mol_property(mol[0])       # Molecule ID 해당하는 모든 Chemical Properties Input - Dict  >> 여기서 NotFound 발생 가능성
+    # level 2-0
+    mol = parse_prot_query(molecule)                            # ID, dict(Properties) - Tuple
+    print('[2-0-0] Test:')
+    print(mol)
 
-mol_prop = parse_mol_property(mol_raw)  # 필요한 Property만 모아서                                     >> 여기서 NotValid 발생 가능성
+    # level 2-1
+    mol_raw = io_mol_property(mol[0])                           # Molecule ID 해당하는 모든 Chemical Properties Input - Dict
+    print('[2-1-0] Test:')
+    print(mol_raw)
 
-mol[1].update(mol_prop)                 # Molecule Tuple의 Property Dict에 추가
+    # level 2-2
+    mol_prop = parse_mol_property(mol_raw)                      # 필요한 Property만 모아서
+    mol[1].update(mol_prop)                                     # Molecule Tuple의 Property Dict에 추가
+    print('[2-2-0] Test:')
+    print(mol)
 
-mol[1]['vdw'] = calc_vdwvolume(mol[1]['canonical_smiles']) # Van der Waals Volume 계산 후 더해주기     >> 여기서 NotValid, EmbedFail 발생 가능성
+    # level 2-3-1
+    mol[1]['vdw'] = calc_vdwvolume(mol[1]['canonical_smiles'])  # Van der Waals Volume 계산 후 더해주기
+    print('[2-3-1] Test:')
+    print(mol)
 
-print(mol)
-# =========================================
+    # level 2-3-2
+    # =========================================
