@@ -11,6 +11,8 @@ from __future__ import annotations
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdchem
 from rdkit.Chem.SaltRemover import SaltRemover
+
+from dimorphite_dl import DimorphiteDL as DD
 # ============================
 
 # Custom Modules
@@ -29,16 +31,17 @@ _N_SEED = 10
 # 시드로 이용할 수의 개수
 _MAXITER = 1000
 # 최적화 반복 계산 횟수
+_UNIQUE_IONIZER = DD()
+# 포멀차지 계산용 프로토네이션
+_DIV_IONIZER = DD(min_ph = 3.9, max_ph = 9.1)
+# 이온화 양상 계산용 프로토네이션
 
 #endregion
 #region INTERNAL
 
-# ============================1
 class _OptError(Exception):
     """ 최적화 실패 반환용 예외 """
-# ============================1
 
-# ============================2
 def _parse_smiles(canonical_smiles : str) -> rdchem.Mol:
     """ smiles를 전용 class로 파싱 """
 
@@ -48,11 +51,8 @@ def _parse_smiles(canonical_smiles : str) -> rdchem.Mol:
         raise NotValidError('잘못된 형태의 Canonical smiles')
 # [NotValidError] : 파싱 실패 예외처리
     return mol
-# 파싱 성공한 Mol 객체 반환
 # Errors : [NotValidError]
-# ============================2
 
-# ============================3
 def _desalt_mol(mol : rdchem.Mol) -> rdchem.Mol:
     """ 염 제거 & Sanitize 함수 """
 
@@ -79,11 +79,8 @@ def _desalt_mol(mol : rdchem.Mol) -> rdchem.Mol:
 # [EmbedFailError] : 염 제거 이후 재표준화 실패한 경우 예외처리
 
     return strip_mol
-# 염 제거한 Mol 객체 반환
 # Errors : [EmbedFailError]
-# ============================3
 
-# ============================4
 def _opt_mol(mol : rdchem.Mol, ise = False) -> None | float:
     """ MMFF기반 물리화학 구조 최적화 """
 
@@ -103,12 +100,10 @@ def _opt_mol(mol : rdchem.Mol, ise = False) -> None | float:
     except (RuntimeError, _OptError):
         raise EmbedFailError('최적화 시도 실패')
 # [EmbedFailError] : 최적화 시도 실패[RuntimeError], 최적화 중 최적해 계산 실패[_OptError] 모두 같은 예외처리
-
-# None 반환
+    
+    return None
 # Errors : [EmbedFailError]
-# ============================4
 
-# ============================5
 def _embed_mol_3d(mol : rdchem.Mol) -> rdchem.Mol:
     """ 3D 임베딩 """
 
@@ -138,14 +133,11 @@ def _embed_mol_3d(mol : rdchem.Mol) -> rdchem.Mol:
 # [EmbedFailError] : 전량 최적화 실패 예외처리
 
     return min(success_list, key = lambda x: x[0])[1]
-# 최소에너지인 단 한 경우만 반환
 # Errors : [EmbedFailError]
-# ============================5
 
 #endregion
 #region MAIN
 
-# =========================================1
 def calc_vdwvolume(canonical_smiles : str) -> float:
     """ smiles 를 이용하여 Van Der Waals Volume을 계산해주는 함수 """
 
@@ -155,17 +147,49 @@ def calc_vdwvolume(canonical_smiles : str) -> float:
 # [EmbedFailError] : 3D embedding
 
     return AllChem.ComputeMolVolume(mol)
-# van der waals volume 계산 후 반환
-# Errors : [NotValidError], [EmbedFailError]
-# =========================================1
 
-# =========================================2
-def calc_ph():
+def calc_formalcharge(canonical_smiles : str) -> float:
+    """ pH 6.4에서의 Formal Charge를 계산하는 함수 """
+
+    pre_mol = _parse_smiles(canonical_smiles)
+    cand_mol = _desalt_mol(pre_mol)
+    clean_smiles = Chem.MolToSmiles(cand_mol)
+    candidate_list = _UNIQUE_IONIZER.protonate(clean_smiles)
+    if not candidate_list:
+        raise EmbedFailError('Protonation 실패')
+    cand_charges = []
+    for cand in candidate_list:
+        try:
+            cand_mol = _parse_smiles(cand)
+        except NotValidError:
+            continue
+        cand_charges.append(sum([atom.GetFormalCharge() for atom in cand_mol.GetAtoms()]))
+    if not cand_charges:
+        raise EmbedFailError('유효한 Protonation 0건')
+
+    print(len(cand_charges))
+
+    return sum(cand_charges) / len(cand_charges)
+
+
+
+    print(candidate_list)
+
+def calc_sigmacharge(canonical_smiles : str) -> float:
     pass
-# dimorphite-DL로 라벨링 -> 베이스 애시드만 따로 서로 세기 비교 가능하게 계산하자
-# =========================================2
 
 #endregion
 
 # test 
-# from pipeline import mol
+if __name__ == '__main__':
+    from pipeline import mol_list
+
+    for mol in mol_list:
+        smiles = mol[1]['canonical_smiles']
+        print(smiles)
+        print(calc_formalcharge(smiles))
+
+# 산염기는 어디로 가야하나
+# 적정 시뮬레이터 전환: 단일 pH 상수를 버리고, pH 구간별 프로토머 앙상블을 스캔하는 적정 곡선 시뮬레이터 구축.
+# Coarse-to-Fine 탐색: 넓은 범위를 대충 훑은 뒤, 전하가 급변하거나 0이 되는 변곡점(Inflection Point) 및 중성 도달 지점(0-Crossing)을 촘촘하게 타겟팅.
+# 고유 임계 좌표 추출: 분자마다 전하가 꺾이는 고유의 임계 pH 좌표를 추출해 피처로 활용 (데이터 뭉개짐 원천 차단).

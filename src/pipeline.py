@@ -43,127 +43,130 @@ RES_DICT : dict = {}
 #region MAIN
 
 # ============================
-# # def pipeline():
-# for prot_id in PROTEIN_IDS:
-#     _omit_mol : list = []
+def pipeline():
+    for prot_id in PROTEIN_IDS:
+        _omit_mol : list = []
 
-#     # 1단계: Input Binding Molecules
-#     # ============================
+        # 1단계: Input Binding Molecules
+        # ============================
 
-#     try:
-#         mol_raw : QuerySet = io_prot_bindmol(prot_id)
+        try:
+            mol_raw : QuerySet = io_prot_bindmol(prot_id)
 
-#     except PipelineError as e:
-#         OMIT_PROT.append(prot_id)
-#         print(f'Protein : {prot_id} : {e}')
-#         continue
+        except PipelineError as e:
+            OMIT_PROT.append(prot_id)
+            print(f'Protein : {prot_id} : {e}')
+            continue
 
-#     # ============================
+        # ============================
 
 
-#     # 2단계: Parse & Create Molecule Property Dictionary
-#     # ============================
+        # 2단계: Parse & Create Molecule Property Dictionary
+        # ============================
 
-#     for raw in mol_raw:
+        for raw in mol_raw:
 
-#             # 2-0 단계 : Set Variable
-#             mol : tuple = parse_prot_query(raw)
-#             mol_id : str = mol[0]
-#             prop_dict : dict[str, float] = mol[1]
-    
-    
-#             # 2-1 단계: Input Molecule Properties
-#             # =================================
+                # 2-0 단계 : Set Variable
+                mol : tuple = parse_prot_query(raw)
+                mol_id : str = mol[0]
+                prop_dict : dict[str, float] = mol[1]
+        
+        
+                # 2-1 단계: Input Molecule Properties
+                # =================================
 
-#             try:
-#                 prop_raw : QuerySet = io_mol_property(mol_id)
-    
-#             except PipelineError as e:
-#                 _omit_mol.append(mol_id)
-#                 print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
-#                 continue
-            
-#             # =================================
-    
-    
-#             # 2-2 단계: Parse Fundamental Molecule Properties    
-#             # =================================
-
-#             try:
-#                 prop : dict = parse_mol_property(prop_raw)
-    
-#             except PipelineError as e:
-#                 _omit_mol.append(mol_id)
-#                 print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
-#                 continue
-    
-#             prop_dict.update(prop)
-
-#             # =================================
-    
-    
-#             # 2-3 단계: Calculate Additional Properties
-#             # =================================
-
-#             canonical_smiles : str = prop_dict['canonical_smiles']
-    
-#             # 2-3-1 단계: Van Der Waals Volume
-#             try:
-#                 vdw : float = calc_vdwvolume(canonical_smiles)
-    
-#             except PipelineError as e:
-#                 _omit_mol.append(mol_id)
-#                 print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
-#                 continue
+                try:
+                    prop_raw : QuerySet = io_mol_property(mol_id)
+        
+                except PipelineError as e:
+                    _omit_mol.append(mol_id)
+                    print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
+                    continue
                 
-#             # 2-3-2 단계: Acidity, Basicity
-#             # 미정
+                # =================================
+        
+        
+                # 2-2 단계: Parse Fundamental Molecule Properties    
+                # =================================
 
-#             # =================================
-            
-#     OMIT_MOL[prot_id] = _omit_mol
+                try:
+                    prop : dict = parse_mol_property(prop_raw)
+        
+                except PipelineError as e:
+                    _omit_mol.append(mol_id)
+                    print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
+                    continue
+        
+                prop_dict.update(prop)
 
-#     # ============================
+                # =================================
+        
+        
+                # 2-3 단계: Calculate Additional Properties
+                # =================================
+
+                canonical_smiles : str = prop_dict['canonical_smiles']
+        
+                # 2-3-1 단계: Van Der Waals Volume
+                try:
+                    vdw : float = calc_vdwvolume(canonical_smiles)
+        
+                except PipelineError as e:
+                    _omit_mol.append(mol_id)
+                    print(f'Protein : {prot_id} - Molecule : {mol_id} : {e}')
+                    continue
+                    
+                # 2-3-2 단계: Acidity, Basicity
+                # 미정
+
+                # =================================
+                
+        OMIT_MOL[prot_id] = _omit_mol
+
+        # ============================
 # ============================
 
 #endregion
 
 
-# test
-if __name__ == '__main__':
-    print('[0-0-0] Test: Get started')
-    print()
 
-    # Test
-    # =========================================
-    test_id = 'CHEMBL203'
-    
-    # level 1
-    raw = io_prot_bindmol(test_id)
-    molecule = raw[12837]
-    print('[1-0-0] Test:')
-    print(molecule)
+# print('[0-0-0] Test: Get started')
+# print()
 
-    # level 2-0
-    mol = parse_prot_query(molecule)                            # ID, dict(Properties) - Tuple
-    print('[2-0-0] Test:')
-    print(mol)
+# Test
+# =========================================
+test_id = 'CHEMBL203'
 
-    # level 2-1
-    mol_raw = io_mol_property(mol[0])                           # Molecule ID 해당하는 모든 Chemical Properties Input - Dict
-    print('[2-1-0] Test:')
-    print(mol_raw)
+# level 1
+raw = io_prot_bindmol(test_id)
+molecule = raw[12837]
+nnn = [raw[n] for n in range(100)]
+# print('[1-0-0] Test:')
+# print(molecule)
 
-    # level 2-2
-    mol_prop = parse_mol_property(mol_raw)                      # 필요한 Property만 모아서
-    mol[1].update(mol_prop)                                     # Molecule Tuple의 Property Dict에 추가
-    print('[2-2-0] Test:')
-    print(mol)
+# level 2-0
+mol = parse_prot_query(molecule)                            # ID, dict(Properties) - Tuple
+mol_list = []
+for m in nnn:
+    mol_list.append(parse_prot_query(m))
+# print('[2-0-0] Test:')
+# print(mol)
 
-    # level 2-3-1
-    mol[1]['vdw'] = calc_vdwvolume(mol[1]['canonical_smiles'])  # Van der Waals Volume 계산 후 더해주기
-    print('[2-3-1] Test:')
-    print(mol)
+# level 2-1
+mol_raw = io_mol_property(mol[0])                           # Molecule ID 해당하는 모든 Chemical Properties Input - Dict
+# print('[2-1-0] Test:')
+# print(mol_raw)
 
-    # level 2-3-2
-    # =========================================
+# level 2-2
+mol_prop = parse_mol_property(mol_raw)                      # 필요한 Property만 모아서
+mol[1].update(mol_prop)                                     # Molecule Tuple의 Property Dict에 추가
+# print('[2-2-0] Test:')
+# print(mol)
+
+# level 2-3-1
+mol[1]['vdw'] = calc_vdwvolume(mol[1]['canonical_smiles'])  # Van der Waals Volume 계산 후 더해주기
+# print('[2-3-1] Test:')
+# print(mol)
+
+# level 2-3-2
+# =========================================
