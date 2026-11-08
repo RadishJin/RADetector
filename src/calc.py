@@ -1,3 +1,4 @@
+#region MODULE & LIBRARY
 ########################## MODULE & LIBRARY ####
 from __future__ import annotations
 
@@ -17,8 +18,8 @@ from rdkit.Chem.SaltRemover import SaltRemover
 from config import EmbedFailError, NotValidError
 # ============================
 #### MODULE & LIBRARY ##########################
-
-
+#endregion
+#region GLOBAL VARIABLE
 ########################### GLOBAL VARIABLE ####
 _SALT_REMOVER = SaltRemover()
 # 염 제거 전용 객체 생성
@@ -29,8 +30,8 @@ _N_SEED = 10
 _MAXITER = 1000
 # 최적화 반복 계산 횟수
 #### GLOBAL VARIABLE ###########################
-
-
+#endregion
+#region INTERNAL
 ################################## INTERNAL ####
 # ============================1
 class _OptError(Exception):
@@ -141,8 +142,8 @@ def _embed_mol_3d(mol : rdchem.Mol) -> rdchem.Mol:
 # Errors : [EmbedFailError]
 # ============================5
 #### INTERNAL ##################################
-
-
+#endregion
+#region MAIN
 ###################################### MAIN ####
 # =========================================1
 def calc_vdwvolume(canonical_smiles : str) -> float:
@@ -164,7 +165,7 @@ def calc_ph():
 # dimorphite-DL로 라벨링 -> 베이스 애시드만 따로 서로 세기 비교 가능하게 계산하자
 # =========================================2
 #### MAIN ######################################
-
+#endregion
 
 # test 
 # from pipeline import mol

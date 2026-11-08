@@ -1,3 +1,4 @@
+#region MODULE & LIBRARY
 ########################## MODULE & LIBRARY ####
 from __future__ import annotations
 
@@ -18,8 +19,8 @@ from calc import calc_vdwvolume
 from config import PipelineError
 # ============================
 #### MODULE & LIBRARY ##########################
-
-
+#endregion
+#region GLOBAL VARIABLE
 ########################### GLOBAL VARIABLE ####
 PROTEIN_IDS : list[str] = [
     'CHEMBL203',    # EFGR
@@ -32,14 +33,14 @@ OMIT_PROT : list[str] = []
 OMIT_MOL : dict[str, list] = {}
 RES_DICT : dict = {}
 #### GLOBAL VARIABLE ###########################
-
-
+#endregion
+#region INTERNAL
 ################################## INTERNAL ####
 # ============================1
 # ============================1
 #### INTERNAL ##################################
-
-
+#endregion
+#region MAIN
 ###################################### MAIN ####
 # ============================
 # # def pipeline():
@@ -125,10 +126,10 @@ RES_DICT : dict = {}
 #     # ============================
 # ============================
 #### MAIN ######################################
+#endregion
 
 
-
-# 실행 진입점 (Entry Point)
+# test
 if __name__ == '__main__':
     print('[0-0-0] Test: Get started')
     print()

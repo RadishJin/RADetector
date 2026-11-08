@@ -1,3 +1,4 @@
+#region MODULE & LIBRARY
 ########################## MODULE & LIBRARY ####
 from __future__ import annotations
 
@@ -16,8 +17,8 @@ from chembl_webresource_client.new_client import new_client
 from config import NotFoundError, NotValidError
 # ============================
 #### MODULE & LIBRARY ##########################
-
-
+#endregion
+#region GLOBAL VARIABLE
 ########################### GLOBAL VARIABLE ####
 _TARGET_KEYS = {
         'alogp', 'psa', 'mw_freebase', 'rtb',
@@ -25,8 +26,8 @@ _TARGET_KEYS = {
     }
 # 필요한 Property Whitelist
 #### GLOBAL VARIABLE ###########################
-
-
+#endregion
+#region INTERNAL
 ################################## INTERNAL ####
 # ============================1
 def _validate_query(query: Iterable[dict]) -> Iterable[dict]:
@@ -44,8 +45,8 @@ def _validate_query(query: Iterable[dict]) -> Iterable[dict]:
 # Errors : [NotFoundError]
 # ============================1
 #### INTERNAL ##################################
-
-
+#endregion
+#region MAIN
 ###################################### MAIN ####
 # ============================1
 def io_prot_bindmol(prot_id: str) -> Iterable[dict]:
@@ -92,7 +93,6 @@ def io_mol_property(mol_id: str) -> dict:
 # ============================2
 
 # ============================3
-# 수정 용이한 형태로 원데이터 파싱
 def parse_prot_query(molecule: dict[str, str | float]) -> tuple[str, dict[str, str | float]]:
     """ ChEMBL Binding  Assay 데이터 정렬, 파싱 함수. 개별 데이터를 다룸. """
 
@@ -123,3 +123,4 @@ def parse_mol_property(mol_prop: dict[str, str | float]) -> dict[str, float]:
 # Errors : [NotFoundError], [NotValidError]
 # ============================4
 #### MAIN ######################################
+#endregion

@@ -1,3 +1,4 @@
+#region MODULE & LIBRARY
 ########################## MODULE & LIBRARY ####
 from __future__ import annotations
 
@@ -13,18 +14,18 @@ from __future__ import annotations
 # ============================
 # ============================
 #### MODULE & LIBRARY ##########################
-
-
+#endregion
+#region GLOBAL VARIABLE
 ########################### GLOBAL VARIABLE ####
 #### GLOBAL VARIABLE ###########################
-
-
+#endregion
+#region INTERNAL
 ################################## INTERNAL ####
 # ============================1
 # ============================1
 #### INTERNAL ##################################
-
-
+#endregion
+#region MAIN
 ###################################### MAIN ####
 # ============================1
 class PipelineError(Exception):
@@ -46,4 +47,4 @@ class NotValidError(PipelineError):
     """ 데이터가 형태에 맞지 않을 때 발생하는 예외 """
 # ============================4
 #### MAIN ######################################
-    
+#endregion
