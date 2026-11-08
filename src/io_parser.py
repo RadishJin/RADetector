@@ -1,5 +1,5 @@
 #region MODULE & LIBRARY
-########################## MODULE & LIBRARY ####
+
 from __future__ import annotations
 
 # Standard Libraries
@@ -16,19 +16,19 @@ from chembl_webresource_client.new_client import new_client
 # ============================
 from config import NotFoundError, NotValidError
 # ============================
-#### MODULE & LIBRARY ##########################
+
 #endregion
 #region GLOBAL VARIABLE
-########################### GLOBAL VARIABLE ####
+
 _TARGET_KEYS = {
         'alogp', 'psa', 'mw_freebase', 'rtb',
         'hba', 'hbd', 'aromatic_rings'
     }
 # 필요한 Property Whitelist
-#### GLOBAL VARIABLE ###########################
+
 #endregion
 #region INTERNAL
-################################## INTERNAL ####
+
 # ============================1
 def _validate_query(query: Iterable[dict]) -> Iterable[dict]:
     """ 이터레이터(쿼리) 무결성 검증 함수. 값이 하나라도 있으면 True """
@@ -44,10 +44,10 @@ def _validate_query(query: Iterable[dict]) -> Iterable[dict]:
 # 값이 하나라도 있는것이 확인된 쿼리 반환
 # Errors : [NotFoundError]
 # ============================1
-#### INTERNAL ##################################
+
 #endregion
 #region MAIN
-###################################### MAIN ####
+
 # ============================1
 def io_prot_bindmol(prot_id: str) -> Iterable[dict]:
     """ ChEMBL Binding Assay 데이터 가져오는 함수 """
@@ -122,5 +122,5 @@ def parse_mol_property(mol_prop: dict[str, str | float]) -> dict[str, float]:
 # 원하는 property만 담긴 딕셔너리 반환
 # Errors : [NotFoundError], [NotValidError]
 # ============================4
-#### MAIN ######################################
+
 #endregion

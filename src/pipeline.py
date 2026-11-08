@@ -1,5 +1,5 @@
 #region MODULE & LIBRARY
-########################## MODULE & LIBRARY ####
+
 from __future__ import annotations
 
 # Standard Libraries
@@ -18,10 +18,10 @@ from calc import calc_vdwvolume
 
 from config import PipelineError
 # ============================
-#### MODULE & LIBRARY ##########################
+
 #endregion
 #region GLOBAL VARIABLE
-########################### GLOBAL VARIABLE ####
+
 PROTEIN_IDS : list[str] = [
     'CHEMBL203',    # EFGR
     'CHEMBL1824',   # HER2
@@ -32,16 +32,16 @@ PROTEIN_IDS : list[str] = [
 OMIT_PROT : list[str] = []
 OMIT_MOL : dict[str, list] = {}
 RES_DICT : dict = {}
-#### GLOBAL VARIABLE ###########################
+
 #endregion
 #region INTERNAL
-################################## INTERNAL ####
+
 # ============================1
 # ============================1
-#### INTERNAL ##################################
+
 #endregion
 #region MAIN
-###################################### MAIN ####
+
 # ============================
 # # def pipeline():
 # for prot_id in PROTEIN_IDS:
@@ -125,7 +125,7 @@ RES_DICT : dict = {}
 
 #     # ============================
 # ============================
-#### MAIN ######################################
+
 #endregion
 
 

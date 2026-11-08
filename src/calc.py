@@ -1,5 +1,5 @@
 #region MODULE & LIBRARY
-########################## MODULE & LIBRARY ####
+
 from __future__ import annotations
 
 # Standard Libraries
@@ -17,10 +17,10 @@ from rdkit.Chem.SaltRemover import SaltRemover
 # ============================
 from config import EmbedFailError, NotValidError
 # ============================
-#### MODULE & LIBRARY ##########################
+
 #endregion
 #region GLOBAL VARIABLE
-########################### GLOBAL VARIABLE ####
+
 _SALT_REMOVER = SaltRemover()
 # 염 제거 전용 객체 생성
 _PARAM = AllChem.ETKDGv3()
@@ -29,10 +29,10 @@ _N_SEED = 10
 # 시드로 이용할 수의 개수
 _MAXITER = 1000
 # 최적화 반복 계산 횟수
-#### GLOBAL VARIABLE ###########################
+
 #endregion
 #region INTERNAL
-################################## INTERNAL ####
+
 # ============================1
 class _OptError(Exception):
     """ 최적화 실패 반환용 예외 """
@@ -141,10 +141,10 @@ def _embed_mol_3d(mol : rdchem.Mol) -> rdchem.Mol:
 # 최소에너지인 단 한 경우만 반환
 # Errors : [EmbedFailError]
 # ============================5
-#### INTERNAL ##################################
+
 #endregion
 #region MAIN
-###################################### MAIN ####
+
 # =========================================1
 def calc_vdwvolume(canonical_smiles : str) -> float:
     """ smiles 를 이용하여 Van Der Waals Volume을 계산해주는 함수 """
@@ -164,7 +164,7 @@ def calc_ph():
     pass
 # dimorphite-DL로 라벨링 -> 베이스 애시드만 따로 서로 세기 비교 가능하게 계산하자
 # =========================================2
-#### MAIN ######################################
+
 #endregion
 
 # test 
