@@ -76,10 +76,13 @@ def io_mol_property(mol_id: str) -> dict:
 
     return query[0]['molecule_properties']
 
-def parse_prot_query(molecule: dict[str, str | float]) -> tuple[str, dict[str, str | float]]:
+def parse_prot_query(molecule: dict[str, str | float]) -> tuple[str, str, dict[str, str | float]]:
     """ ChEMBL Binding  Assay 데이터 정렬, 파싱 함수. 개별 데이터를 다룸. """
 
-    return (molecule['molecule_chembl_id'], {k: v for k, v in molecule.items() if k != 'molecule_chembl_id' and k != 'value'})
+    return (molecule['molecule_chembl_id'],
+            molecule['canonical_smiles'],
+            {k: v for k, v in molecule.items() if k != 'molecule_chembl_id' and k != 'value' and k != 'canonical_smiles'}
+    )
 
 def parse_mol_property(mol_prop: dict[str, str | float]) -> dict[str, float]:
     """ ChEMBL Molecule pKa 데이터 정렬, 파싱 함수. 개별 데이터를 다룸. """
