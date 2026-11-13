@@ -11,24 +11,19 @@ from rdkit.Chem.SaltRemover import SaltRemover
 from dimorphite_dl import DimorphiteDL as DD
 
 # Custom Modules
-from config import EmbedFailError, NotValidError
+from exceptions import EmbedFailError, NotValidError
 
 # =========================================
 #endregion
 #region GLOBAL VARIABLE
-# =========================================
 
 _SALT_REMOVER = SaltRemover()
 _PARAM = AllChem.ETKDGv3()   
-_N_SEED = 10
-_MAXITER = 1000
 _UNIQUE_IONIZER = DD()
 _DIV_IONIZER = DD(min_ph = 3.9, max_ph = 9.1)
 
-# =========================================
 #endregion
 #region INTERNAL
-# =========================================
 
 class _OptError(Exception):
     """ 최적화 실패 반환용 예외 """
@@ -83,11 +78,11 @@ def _desalt_mol(mol : rdchem.Mol) -> rdchem.Mol:
     return strip_mol
 # Errors : [EmbedFailError]
 
-def _opt_mol(mol : rdchem.Mol, ise = False) -> None | float:
+def _opt_mol(mol : rdchem.Mol, maxiter : int, ise : bool = False) -> None | float:
     """ MMFF기반 물리화학 구조 최적화 """
 
     try:
-        idx = AllChem.MMFFOptimizeMolecule(mol, maxIters = _MAXITER)        
+        idx = AllChem.MMFFOptimizeMolecule(mol, maxIters = maxiter)        
 
         if idx != 0:
             raise _OptError
@@ -101,13 +96,13 @@ def _opt_mol(mol : rdchem.Mol, ise = False) -> None | float:
         raise EmbedFailError('최적화 시도 실패')
 # Errors : [EmbedFailError]
 
-def _embed_mol_3d(mol : rdchem.Mol) -> rdchem.Mol:
+def _embed_mol_3d(mol : rdchem.Mol, maxseed : int, maxiter : int) -> rdchem.Mol:
     """ 3D 임베딩 """
 
     mol_std = Chem.AddHs(mol)
     success_list = []
 
-    for seed in range(_N_SEED):
+    for seed in range(maxseed):
         psdmol = rdchem.Mol(mol_std)
         _PARAM.randomSeed = seed
         idx = AllChem.EmbedMolecule(psdmol, _PARAM)
@@ -116,7 +111,7 @@ def _embed_mol_3d(mol : rdchem.Mol) -> rdchem.Mol:
             continue
 
         try:
-            success_list.append((_opt_mol(psdmol, ise = True), psdmol))
+            success_list.append((_opt_mol(psdmol, maxiter, ise = True), psdmol))
         except EmbedFailError:
             continue
 
@@ -126,10 +121,8 @@ def _embed_mol_3d(mol : rdchem.Mol) -> rdchem.Mol:
     return min(success_list, key = lambda x: x[0])[1]
 # Errors : [EmbedFailError]
 
-# =========================================
 #endregion
 #region MAIN
-# =========================================
 
 def clean_smiles(raw_smiles : str) -> str:
     """ smiles의 염 제거, Sanitize하여 표준화하는 함수"""
@@ -140,12 +133,12 @@ def clean_smiles(raw_smiles : str) -> str:
 
     return clean_smiles
 
-def calc_vdwvolume(canonical_smiles : str) -> float:
+def calc_vdwvolume(canonical_smiles : str, maxseed : int, maxiter : int) -> float:
     """ smiles 를 이용하여 Van Der Waals Volume을 계산해주는 함수 """
 
     mol = _parse_smiles(canonical_smiles)
 
-    mol = _embed_mol_3d(mol)
+    mol = _embed_mol_3d(mol, maxseed, maxiter)
 
     return AllChem.ComputeMolVolume(mol)
 
@@ -171,14 +164,9 @@ def calc_formalcharge(canonical_smiles : str) -> float:
 
     return sum(cand_charges) / len(cand_charges)
 
-
-
-    print(candidate_list)
-
 def calc_sigmacharge(canonical_smiles : str) -> float:
     pass
 
-# =========================================
 #endregion
 
 # test 

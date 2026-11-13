@@ -1,5 +1,4 @@
 #region MODULE & LIBRARY
-# =========================================
 from __future__ import annotations
 
 # Standard Libraries
@@ -8,19 +7,16 @@ from __future__ import annotations
 from chembl_webresource_client.new_client import new_client, QuerySet
 
 # Custom Modules
-from config import NotFoundError, NotValidError
+from exceptions import NotFoundError, NotValidError
 
-# =========================================
 #endregion
 #region GLOBAL VARIABLE
-# =========================================
 
 _TARGET_KEYS = {
         'alogp', 'psa', 'mw_freebase', 'rtb',
         'hba', 'hbd', 'aromatic_rings'
     }
 
-# =========================================
 #endregion
 #region INTERNAL
 # =========================================
@@ -39,7 +35,6 @@ def _validate_query(query: QuerySet) -> QuerySet:
 # =========================================
 #endregion
 #region MAIN
-# =========================================
 
 def io_prot_bindmol(prot_id: str) -> QuerySet:
     """ ChEMBL Binding Assay 데이터 가져오는 함수 """
@@ -76,7 +71,7 @@ def io_mol_property(mol_id: str) -> dict:
 
     return query[0]['molecule_properties']
 
-def parse_prot_query(molecule: dict[str, str | float]) -> tuple[str, str, dict[str, str | float]]:
+def parse_mol_query(molecule: dict[str, str | float]) -> tuple[str, str, dict[str, str | float]]:
     """ ChEMBL Binding  Assay 데이터 정렬, 파싱 함수. 개별 데이터를 다룸. """
 
     return (molecule['molecule_chembl_id'],

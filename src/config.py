@@ -4,25 +4,8 @@ from __future__ import annotations
 # Standard Libraries
 from dataclasses import dataclass, field
 
-# Third-Party Libraries
-
-# Custom Modules
-from calc import clean_smiles
-
 #endregion
 #region MAIN
-
-class PipelineError(Exception):
-    """ 파이프라인 에러 전체의 모예외 """
-
-class NotFoundError(PipelineError):
-    """ 데이터가 존재하지 않을 때 발생하는 예외 """
-
-class EmbedFailError(PipelineError):
-    """ 분자 임베딩 실패 시 발생하는 예외 """
-
-class NotValidError(PipelineError):
-    """ 데이터가 형태에 맞지 않을 때 발생하는 예외 """
 
 @dataclass
 class Setting:
@@ -32,7 +15,7 @@ class Setting:
     maxseed : int = 10
 
     # Molecule 3D Optimization 간 최적 구조를 찾기 위해 연산을 몇 번 반복할지
-    maxiters : int = 1000
+    maxiter : int = 1000
 
     # Molecule Property Parsing 간 Whitelist
     target_properties : set = field(

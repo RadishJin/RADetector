@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 # Third-Party Libraries
 
 # Custom Modules
-from calc import clean_smiles
+from calc import clean_smiles, calc_vdwvolume
 
 #endregion
 #region MAIN
@@ -19,7 +19,19 @@ class Molecule:
     smiles : str
     properties : dict = field(default_factory = dict)
 
-    def __post_init__(self):
-        self.smiles = clean_smiles(self.smiles)
+    @classmethod
+    def extended(cls,
+                mol_id : str,
+                raw_smiles : str,
+                properties : dict = field(default_factory = dict),
+                maxseed : int = 10,
+                maxiter : int = 1000) -> Molecule:
+        
+        smiles = clean_smiles(raw_smiles)
+        vdw : float = calc_vdwvolume(smiles, maxseed, maxiter)
+
+        properties['vdw'] = vdw
+
+        return cls(mol_id, smiles, properties)
 
 #endregion
