@@ -1,8 +1,8 @@
 #region MODULE & LIBRARY
-# =========================================
 from __future__ import annotations
 
 # Standard Libraries
+from statistics import pstdev
 
 # Third-Party Libraries
 from rdkit import Chem
@@ -13,14 +13,12 @@ from dimorphite_dl import DimorphiteDL as DD
 # Custom Modules
 from exceptions import EmbedFailError, NotValidError
 
-# =========================================
 #endregion
 #region GLOBAL VARIABLE
 
 _SALT_REMOVER = SaltRemover()
 _PARAM = AllChem.ETKDGv3()   
-_UNIQUE_IONIZER = DD()
-_DIV_IONIZER = DD(min_ph = 3.9, max_ph = 9.1)
+_IONIZER = DD(min_ph = 3.9, max_ph = 9.1)
 
 #endregion
 #region INTERNAL
@@ -142,16 +140,14 @@ def calc_vdwvolume(canonical_smiles : str, maxseed : int, maxiter : int) -> floa
 
     return AllChem.ComputeMolVolume(mol)
 
-def calc_formalcharge(canonical_smiles : str) -> float:
-    """ pH 6.4에서의 Formal Charge를 계산하는 함수 """
+def calc_sigmacharge(canonical_smiles : str) -> float:
+    """ pH 3.9 ~ 9.1 까지의 가능한 모든 프로토머의 Formal Charge standard deviation 구해주는 함수 """
 
-    candidate_list = _UNIQUE_IONIZER.protonate(canonical_smiles)
-
+    candidate_list = _IONIZER.protonate(canonical_smiles)
     if not candidate_list:
         raise EmbedFailError('Protonation 실패')
-    
-    cand_charges = []
 
+    cand_charges = []
     for cand in candidate_list:
         try:
             cand_mol = _parse_smiles(cand)
@@ -161,24 +157,9 @@ def calc_formalcharge(canonical_smiles : str) -> float:
 
     if not cand_charges:
         raise EmbedFailError('유효한 Protonation 0건')
+    if len(cand_charges) < 2:
+        return 0.0
 
-    return sum(cand_charges) / len(cand_charges)
-
-def calc_sigmacharge(canonical_smiles : str) -> float:
-    pass
+    return pstdev(cand_charges)
 
 #endregion
-
-# test 
-if __name__ == '__main__':
-    from pipeline import mol_list
-
-    for mol in mol_list:
-        smiles = mol[1]['canonical_smiles']
-        print(smiles)
-        print(calc_formalcharge(smiles))
-
-# 산염기는 어디로 가야하나
-# 적정 시뮬레이터 전환: 단일 pH 상수를 버리고, pH 구간별 프로토머 앙상블을 스캔하는 적정 곡선 시뮬레이터 구축.
-# Coarse-to-Fine 탐색: 넓은 범위를 대충 훑은 뒤, 전하가 급변하거나 0이 되는 변곡점(Inflection Point) 및 중성 도달 지점(0-Crossing)을 촘촘하게 타겟팅.
-# 고유 임계 좌표 추출: 분자마다 전하가 꺾이는 고유의 임계 pH 좌표를 추출해 피처로 활용 (데이터 뭉개짐 원천 차단).

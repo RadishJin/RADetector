@@ -1,8 +1,6 @@
 #region MODULE & LIBRARY
 from __future__ import annotations
 
-# Standard Libraries
-
 # Third-Party Libraries
 from chembl_webresource_client.new_client import new_client, QuerySet
 
@@ -76,7 +74,8 @@ def parse_mol_query(molecule: dict[str, str | float]) -> tuple[str, str, dict[st
 
     return (molecule['molecule_chembl_id'],
             molecule['canonical_smiles'],
-            {k: v for k, v in molecule.items() if k != 'molecule_chembl_id' and k != 'value' and k != 'canonical_smiles'}
+            molecule['pchembl_value'],
+            {k: v for k, v in molecule.items() if k !='molecule_chembl_id' and k !='value' and k !='canonical_smiles' and k !='pchembl_value'}
     )
 
 def parse_mol_property(mol_prop: dict[str, str | float]) -> dict[str, float]:
@@ -98,5 +97,4 @@ def parse_mol_property(mol_prop: dict[str, str | float]) -> dict[str, float]:
             
     return parsed
 
-# =========================================
 #endregion
