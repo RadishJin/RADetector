@@ -16,21 +16,3 @@ Comparison D : CA2 (Carbonic Anhydrase 2) CHEMBL205
  > Different Family, Simular RADetect
 
 
-Overview
-
-1. target protein의 molecule interaction data parsing (bash, python)
-    i. API로 데이터셋 긁어오기
-    ii. 결합 분자 리스트 만들기
-
-2. target protein의 molecular interaction 데이터로 일종의 지문 도출 (python)
-    ii. 가로축은 Van der Waals volume, 세로축은 pKa로 ndarray 배열 생성 -> 나중에 뭐든 추가될 수 있게
-    iii. Gaussian Kernal Density Estimation 이용 2D 이미지로 변환 -> n차원 확장 가능하게
-    v. target protein에 할당
-
-3. ndarray 유사도 평가 (python)
-    i. gaussian kde를 cosine simularity 비교
-    ii. 문서화
-
-4. 실제 알려진 기능 유사도와 RADetect 결과물 비교 (결과 작성)
-
-

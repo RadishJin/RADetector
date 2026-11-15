@@ -1,8 +1,6 @@
 #region MODULE & LIBRARY
 from __future__ import annotations
 
-# Standard Libraries
-
 # Third-Party Libraries
 import pandas as pd
 import numpy as np
@@ -47,10 +45,9 @@ def _stdscaler(prot_a : pd.DataFrame, prot_b : pd.DataFrame) -> tuple[np.ndarray
 #endregion
 #region MAIN
 
-def unit_array(prop : dict, pchembl : float, id : str) -> dict:
+def unit_array(id : str, prop : dict) -> dict:
     return {
         'mol_id' : id,
-        'pchembl' : pchembl,
         **prop  
     }
 

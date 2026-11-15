@@ -1,89 +1,54 @@
 #region MODULE & LIBRARY
 from __future__ import annotations
 
-# Standard Libraries
-
-# Third-Party Libraries
-from chembl_webresource_client.new_client import QuerySet
-
 # Custom Modules & Classes
-from io_parser import io_prot_bindmol, parse_mol_query
-from pipeline import get_known_props
-from build import how_similar
+from pipeline import radetector
+from domain import RADetect
+from config import Setting, Config, setup_global_logger
 from exceptions import PipelineError
-from config import Setting, Config
-from domain import Molecule, RADetect
+
+#endregion
+#region GLOBAL VARIABLE
+
+logger = setup_global_logger()
+setting = Setting()
+config = Config()
 
 #endregion
 #region MAIN
 
-setting = Setting(target_proteins= ['CHEMBL203'])
-config = Config(setting.target_proteins)
-
-# for prot_id in config.prot_ids:
-
-#     try:
-#         mol_raw : QuerySet = io_prot_bindmol(prot_id)
-#     except PipelineError as e:
-#         config.omits[prot_id] = 'All'
-#         print(f'Protein : {prot_id} : {e}')
-#         continue 
-
-#     config.omits[prot_id] = []
-#     for raw in mol_raw:
-#         data : tuple = parse_mol_query(raw)
-
-#         try:
-#             mol = Molecule.extended(data[0], data[1], data[2], data[3], setting.maxseed, setting.maxiter)
-
-#         except PipelineError as e:
-#                     config.omits[prot_id].append(data[0])
-#                     print(f'Protein : {prot_id} - Molecule : {data[0]} : {e}')
-#                     continue
+def main():
+    logger.info("===== RADetector 가동 시작 =====")
+    rad_list = []
+    for prot_id in setting.target_proteins:
+        config.omits[prot_id] = []
         
-#         try:
-#             mol.properties.update(get_known_props(mol.id))
+        try:
+            rad_list.append(radetector(prot_id, setting, config))
+            logger.info(f'===== Protein : {prot_id} - RADetect 생성 성공 =====')
 
-#         except PipelineError as e:
-#             config.omits[prot_id].append(mol.id)
-#             print(f'Protein : {prot_id} - Molecule : {mol.id} : {e}')
-#             continue
+        except PipelineError as e:
+            config.omits[prot_id] = 'All'
+            logger.error(f'===== 실패한 Protein : {prot_id} - {e} =====')
+            continue 
 
-#         print(f'Successful with {prot_id} - {mol.id}')
-#         config.res_mols.append(mol)
-    
-#         # 아래로는 미정
+    if not (len(rad_list) == len(setting.target_proteins)):
+        logger.critical(f'===== {len(setting.target_proteins) - len(rad_list)}개 단백질 RADetect 생성 실패, 프로그램 종료 =====')
+        return
 
-# print(len(mol_raw))
-# print(len(config.omits))
-# print(len(config.res_mols))
+    rad : RADetect = rad_list[0]
+
+    logger.info('===RESULT========================')
+    for target_rad in rad_list:
+        logger.info('===== 유사도 연산 진입 =====')
+        similarity = rad.similar(target_rad, setting.gamma)
+        logger.info(f'{rad.prot_id}, {target_rad.prot_id} 유사도 : {similarity}')
+    logger.info('===RESULT========================')
 
 #endregion
 
-# test
-prot_id = config.prot_ids[0]
+if __name__ == '__main__':
+    main()
 
-mol_raw : QuerySet = io_prot_bindmol(prot_id)
-
-for i in range(10, 224):
-    data : tuple = parse_mol_query(mol_raw[i])
-    mol = Molecule.extended(data[0], data[1], data[2], data[3], setting.maxseed, setting.maxiter)
-    mol.properties.update(get_known_props(mol.id))
-    config.res_mols.append(mol)
-
-rad_a = RADetect.extended(prot_id, config.res_mols)
-
-
-prot_a = rad_a.array
-
-print(prot_a)
-print(how_similar(prot_a, prot_a, gamma = 1.0))
-
-
-
-
-
-
-# setting에서 프로틴 아이디를 받게하기, config는 몰라야함
 # batch API
 # MultiProcessing
