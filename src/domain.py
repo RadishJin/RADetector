@@ -4,14 +4,18 @@ from __future__ import annotations
 # Standard Libraries
 from dataclasses import dataclass, field
 from typing import Any
+import logging
 
 # Custom Modules
 from io_parser import io_mol_property_batch, parse_mol_property
 from chem import clean_smiles, calc_vdwvolume, calc_sigmacharge
 from build import unit_array, build_array, how_similar
+from exceptions import NotFoundError, NotValidError
 
 #endregion
 #region MAIN
+
+logger = logging.getLogger(__name__)
 
 def get_known_props(mol_ids : list, batch_size : int, max_retries : int) -> dict[str, dict]:
     """ 이미 알려져서 ChEMBL에 올라와있는 Molecule Property를 가져오는 함수 """
@@ -20,7 +24,11 @@ def get_known_props(mol_ids : list, batch_size : int, max_retries : int) -> dict
     res = {}
     for mol_id in mol_ids:
         if mol_id in prop_raw and prop_raw[mol_id]:
-            res[mol_id] = parse_mol_property(prop_raw[mol_id])
+            try:
+                res[mol_id] = parse_mol_property(prop_raw[mol_id])
+            except (NotFoundError, NotValidError):
+                logger.error(f'{mol_id} 물성치 누락')
+                continue
 
     return res
 

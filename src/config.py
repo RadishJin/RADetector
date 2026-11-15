@@ -10,7 +10,7 @@ from datetime import datetime
 #endregion
 #region MAIN
 
-def setup_global_logger(name : str = "RADetector", log_dir : str = 'logs') -> logging.Logger:
+def setup_global_logger(log_dir : str = 'logs') -> logging.Logger:
     """
     전역 로거를 초기화하여 세팅함
     - Console : INFO level 이상의 log 출력
@@ -18,7 +18,7 @@ def setup_global_logger(name : str = "RADetector", log_dir : str = 'logs') -> lo
     """
     os.makedirs(log_dir, exist_ok = True)
 
-    logger = logging.getLogger(name)
+    logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
 
     formatter = logging.Formatter(
@@ -31,7 +31,7 @@ def setup_global_logger(name : str = "RADetector", log_dir : str = 'logs') -> lo
     console_handler.setFormatter(formatter)
 
     today_str = datetime.now().strftime("%Y%m%d")
-    log_file_path = os.path.join(log_dir, f"{name.lower()}_{today_str}.log")
+    log_file_path = os.path.join(log_dir, f"{today_str}.log")
     
     file_handler = logging.FileHandler(log_file_path, encoding="utf-8")
     file_handler.setLevel(logging.DEBUG)

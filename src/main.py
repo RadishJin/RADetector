@@ -1,6 +1,9 @@
 #region MODULE & LIBRARY
 from __future__ import annotations
 
+# Standard Libraries
+import logging
+
 # Custom Modules & Classes
 from pipeline import radetector
 from domain import RADetect
@@ -16,6 +19,9 @@ config = Config()
 
 #endregion
 #region MAIN
+
+# ChEMBL 클라이언트나 urllib3 쪽 로그는 너무 시끄러우니 WARNING 이상만 찍도록 잠재우기
+logging.getLogger("chembl_webresource_client").setLevel(logging.WARNING)
 
 def main():
     logger.info("===== RADetector 가동 시작 =====")
@@ -49,6 +55,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-# batch API
-# MultiProcessing

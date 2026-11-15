@@ -3,6 +3,7 @@ from __future__ import annotations
 
 # Standard Libraries
 import time
+import logging
 
 # Third-Party Libraries
 from chembl_webresource_client.new_client import new_client, QuerySet
@@ -46,6 +47,7 @@ def _mol_batchapi_trial(molecule, chunk, max_retries) -> QuerySet:
         except Exception:
             if att == max_retries - 1:
                 break
+            logger.warning(f'[Batch 일시적 실패] : {delay} 초 대기')
             time.sleep(delay)
             delay *= 2
 
@@ -66,6 +68,7 @@ def _mol_singleapi_trial(molecule, single, max_retries) -> QuerySet:
         except Exception:
             if att == max_retries - 1:
                 break
+            logger.warning(f'[Batch 일시적 실패] : {delay} 초 대기')
             time.sleep(delay)
             delay *= 2
 
@@ -75,7 +78,9 @@ def _mol_singleapi_trial(molecule, single, max_retries) -> QuerySet:
 #endregion
 #region MAIN
 
-def io_prot_bindmol(prot_id: str) -> QuerySet:
+logger = logging.getLogger(__name__)
+
+def io_prot_bindmol(prot_id: str) -> list:
     """ ChEMBL Binding Assay 데이터 가져오는 함수 """
 
     activity = new_client.activity
@@ -92,7 +97,7 @@ def io_prot_bindmol(prot_id: str) -> QuerySet:
 
     query = _validate_query(query)
 
-    return query
+    return list(query)
 
 def io_mol_property_batch(mol_ids: list, batch_size : int, max_retries : int) -> dict:
     """ ChEMBL Molecule Property 데이터 가져옴 """
@@ -110,7 +115,7 @@ def io_mol_property_batch(mol_ids: list, batch_size : int, max_retries : int) ->
             query = _mol_batchapi_trial(molecule, chunk, max_retries)
             total = [(q['molecule_chembl_id'], q['molecule_properties']) for q in query]
             res_list.extend(total)
-            
+
         except (TimeOutError, NotFoundError):
             for single in chunk:
                 try:

@@ -18,7 +18,7 @@ from exceptions import EmbedFailError, NotValidError
 
 _SALT_REMOVER = SaltRemover()
 _PARAM = AllChem.ETKDGv3()   
-_IONIZER = DD(min_ph = 3.9, max_ph = 9.1)
+_IONIZER = DD(min_ph = 3.9, max_ph = 9.1, max_variants=1024)
 
 #endregion
 #region INTERNAL
